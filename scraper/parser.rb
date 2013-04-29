@@ -51,8 +51,8 @@ module DzInfo
         end
 
         def coords(node)
-          node.css('.halfblock.floatleft').each do |script|
-            latlng = script.content.scan(/Lat: (-?\d+\.\d+)\s+Lng: (-?\d+\.\d+)/).flatten
+          node.css('.halfblock.floatleft').each do |div|
+            latlng = div.content.scan(/Lat: (-?\d+\.\d+)\s+Lng: (-?\d+\.\d+)/).flatten
             return latlng.map(&:to_f) unless latlng.empty?
           end
           return nil 
