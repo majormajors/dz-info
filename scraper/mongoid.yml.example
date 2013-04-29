@@ -1,0 +1,6 @@
+development:
+  sessions:
+    default:
+      database: dzinfo
+      hosts:
+        - localhost:27017

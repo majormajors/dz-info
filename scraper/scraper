@@ -1,0 +1,17 @@
+#!/usr/bin/env ruby
+
+require 'open-uri'
+require 'nokogiri'
+require 'mongoid'
+
+$: << File.dirname(__FILE__)
+require 'model'
+require 'parser'
+
+ENV['MONGOID_ENV'] = 'development'
+Mongoid.load!(File.expand_path('mongoid.yml'))
+
+Dir['html/**/*.html'].each do |filename|
+  DzInfo::Scraper::Parser.for_file(filename).parse!
+end
+

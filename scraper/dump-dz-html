@@ -1,0 +1,43 @@
+#!/usr/bin/env ruby
+# encoding: UTF-8
+
+require 'fileutils'
+require 'open-uri'
+require 'nokogiri'
+
+[ 'dropzone.com',
+  'uspa.org' ].each { |a| FileUtils.mkdir_p "html/#{a}" }
+
+# Dump dropzone.com files
+MAX_DZ = 2000
+0.upto(MAX_DZ) do |i|
+  html = open("http://www.dropzone.com/dropzone/Detailed/#{i}.shtml").read
+  doc = Nokogiri::HTML(html)
+  name = doc.css('h1 span.fn')
+  unless name.nil? || name.empty?
+    filename = "html/dropzone.com/%04d.html" % i
+    puts "Writing #{filename}..."
+    File.open(filename, "w") do |f|
+      f.puts html
+    end
+  end
+end
+
+# Dump upsa.org files
+SECTIONS = [ "http://www.uspa.org/FindaDZ/GroupMemberListbyStateandTerritories/tabid/321/Default.aspx",
+             "http://www.uspa.org/FindaDZ/GroupMemberListbyCountry/tabid/408/Default.aspx" ]
+DZ_LIST_REGEX = %r{GroupMemberListby(?:StateandTerritories|Country)/(\w+)/tabid/(\d+)}
+SECTIONS.each do |section_url|
+  section_html = Nokogiri::HTML(open(section_url))
+  pages = section_html.css("a").map{ |a| a.attribute 'href' }.compact.select{ |a| a.value.match DZ_LIST_REGEX }.map(&:value)
+  pages.each do |page|
+    location, id = page.scan(DZ_LIST_REGEX).flatten
+    html = open(page).read
+    doc = Nokogiri::HTML(html)
+    filename = "html/uspa.org/%04d-%s.html" % [id, location]
+    puts "Writing #{filename}..."
+    File.open(filename, "w") do |f|
+      f.puts html
+    end
+  end
+end
