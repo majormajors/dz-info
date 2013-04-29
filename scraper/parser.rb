@@ -11,6 +11,10 @@ module DzInfo
         file = File.open(file.to_s, 'r') unless file.is_a?(IO)
         doc = Nokogiri::HTML(file)
 
+        # I wasn't really sure about a fool-proof way
+        # to actually glean this from the content of
+        # the page, but whatever. This script is meant
+        # to suck.
         case file.path
         when /uspa\.org/
           UspaParser.new(doc)
@@ -22,20 +26,17 @@ module DzInfo
       end
 
       class Base
-        @@parse_calls = 0
         def initialize(doc)
           @doc = doc
         end
 
         def parse!(node=nil)
           node ||= @doc
-          @@parse_calls += 1
 
-          #dz = Model::Dropzone.new(source: source,
-          #                         name: s[:name].call(@doc),
-          #                         coordinates: s[:coordinates].call(@doc))
-          #dz.save!
-          puts "Num: #{@@parse_calls}" 
+          # For now, I'm just outputting the data to make it
+          # easier/quicker to iterate on until I'm satisfied
+          # enough for an actual import. This will be repalced
+          # with a DB call later
           puts "Name: #{name(node)}"
           puts "Coords: #{coords(node)}"
           puts "Source: #{source}"
